@@ -1,0 +1,1533 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OPERATOR TERMINAL // HONGLIN JIA</title>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700&family=IBM+Plex+Mono:wght@400;600&family=VT323&display=swap" rel="stylesheet">
+<style>
+/* ===== 核心变量（加入流式排版与更严谨的间距） ===== */
+:root {
+  --bg: #050505;
+  --panel: rgba(13, 13, 13, 0.95);
+  --border: #2a2a2a;
+  --text: #e0e0e0;
+  --text-dim: #999999; 
+  --text-dim-dark: #666666; 
+  
+  --f-journey: #FF2A6D;
+  --f-music: #66FFA6;
+  --f-games: #FF5500;
+  --f-works: #39FF14;
+  
+  --f-contact: #FF2A2A;
+  --f-contact-panel: #9D00FF;
+
+  --swiss-accent: #CCFF00;
+  --marathon-red: #FF2A2A;
+
+  --font-head: 'Chakra Petch', sans-serif;
+  --font-mono: 'IBM Plex Mono', monospace; 
+  --font-terminal: 'VT323', monospace;     
+  --font-cn: 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+
+  /* 流式尺寸变量，确保全分辨率下比例和谐 */
+  --fluid-h1: clamp(3rem, 7vw, 7rem);
+  --fluid-h2: clamp(2rem, 4vw, 3.5rem);
+  --fluid-p: clamp(0.9rem, 1.1vw, 1.1rem);
+  --fluid-pad: clamp(1.5rem, 4vw, 4rem);
+  --fluid-gap: clamp(1rem, 2vw, 2.5rem);
+}
+
+html { font-size: 16px; }
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+/* ===== 键盘导航无障碍 ===== */
+:focus-visible {
+  outline: 2px dashed var(--f-works) !important;
+  outline-offset: 4px;
+  animation: focusPulse 1.5s infinite alternate;
+}
+@keyframes focusPulse {
+  0% { outline-color: var(--f-works); box-shadow: 0 0 5px var(--f-works); }
+  100% { outline-color: var(--f-journey); box-shadow: 0 0 15px var(--f-journey); }
+}
+:focus:not(:focus-visible) { outline: none; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-mono); 
+  min-height: 100vh;
+  overflow-x: clip; 
+  position: relative;
+}
+
+/* ===== CRT 扫描线与噪点 ===== */
+body::before {
+  content: ""; position: fixed; inset: 0;
+  background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.08) 2px, rgba(0,0,0,0.08) 4px);
+  pointer-events: none; z-index: 999;
+}
+body::after {
+  content: ""; position: fixed; inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.025'/%3E%3C/svg%3E");
+  pointer-events: none; z-index: 1000;
+}
+
+/* ===== 顶部状态栏 ===== */
+.status-bar {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 12px clamp(1rem, 4vw, 3rem); 
+  border-bottom: 2px solid var(--border);
+  background: rgba(5, 5, 5, 0.85); 
+  position: sticky; top: 0; z-index: 100;
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  font-family: var(--font-terminal); font-size: 1.4rem; 
+  color: var(--f-works); text-transform: uppercase; letter-spacing: 0.15em;
+  transition: color 0.3s, border-color 0.3s;
+}
+.status-bar.alert { color: var(--f-contact); border-bottom-color: var(--f-contact); }
+.status-bar .left { display: flex; gap: 24px; align-items: center; }
+.status-bar .right { display: flex; gap: 20px; align-items: center; }
+.status-bar .blink { color: var(--f-contact); animation: blink 1s step-end infinite; }
+@keyframes blink { 50% { opacity: 0; } }
+
+/* ===== 核心：全分辨率自适应 12 列非对称网格 ===== */
+.grid {
+  display: grid; 
+  grid-template-columns: 1fr; 
+  gap: 1px;
+  background: var(--border);
+  width: 100%; 
+  border-bottom: 1px solid var(--border);
+  position: relative; 
+  z-index: 5;
+}
+
+.panel { grid-column: 1 / -1; }
+
+@media (min-width: 768px) {
+  .grid { grid-template-columns: repeat(2, 1fr); }
+  .span-wide { grid-column: span 2; }
+}
+
+@media (min-width: 1100px) {
+  .grid { grid-template-columns: repeat(12, 1fr); }
+  .panel.journey { grid-column: span 7; }
+  .panel.music { grid-column: span 5; }
+  .panel.games { grid-column: span 7; }
+  .panel.encrypted { grid-column: span 5; }
+  .span-full { grid-column: 1 / -1; }
+  
+  .works-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+  }
+}
+
+@media (min-width: 1920px) {
+  html { font-size: 18px; }
+  .grid {
+    max-width: 1800px;
+    margin: 0 auto;
+    border-left: 1px solid var(--border);
+    border-right: 1px solid var(--border);
+  }
+}
+@media (min-width: 2560px) {
+  html { font-size: 22px; }
+  .grid { max-width: 2000px; }
+}
+
+/* ===== 面板基础 ===== */
+.panel {
+  background: var(--panel); 
+  padding: var(--fluid-pad); 
+  position: relative;
+  clip-path: polygon(20px 0, 100% 0, 100% calc(100% - 20px), calc(100% - 20px) 100%, 0 100%, 0 20px);
+  overflow: hidden; 
+  --panel-color: var(--text-dim);
+  
+  opacity: 0; 
+  transition: opacity 0.8s ease, --panel-color 0.3s;
+}
+.panel.revealed { opacity: 1; }
+
+.panel:hover { 
+  --panel-color: var(--hover-color);
+  filter: saturate(1.2) brightness(1.1); 
+}
+
+.panel::before {
+  content: ""; position: absolute; top: 8px; left: 8px;
+  width: 20px; height: 20px; 
+  border-top: 2px solid var(--panel-color); border-left: 2px solid var(--panel-color);
+  transition: border-color 0.3s;
+}
+.panel::after {
+  content: ""; position: absolute; bottom: 8px; right: 8px;
+  width: 20px; height: 20px; 
+  border-bottom: 2px solid var(--panel-color); border-right: 2px solid var(--panel-color);
+  transition: border-color 0.3s;
+}
+
+.panel.journey { --hover-color: var(--f-journey); }
+.panel.music { --hover-color: var(--f-music); }
+.panel.games { --hover-color: var(--f-games); }
+.panel.works { --hover-color: var(--f-works); }
+.panel.contact { --hover-color: var(--f-contact-panel); }
+
+/* ===== 面板头部行 ===== */
+.panel-head-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.5rem;
+}
+.panel-head-row .label { margin-bottom: 0; }
+
+/* ===== 语言开关 [00 EC / 01 EN / 02 中] ===== */
+.panel-lang-switch {
+  display: inline-grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  border: 1px solid var(--border);
+  background: transparent;
+  vertical-align: middle;
+}
+.lang-seg {
+  all: unset;
+  box-sizing: border-box;
+  display: flex;
+  align-items: baseline;
+  gap: 5px;
+  padding: 4px 8px 3px;
+  cursor: pointer;
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-dim-dark);
+  border-bottom: 2px solid transparent;
+  transition: color 0.15s ease, border-color 0.15s ease;
+  white-space: nowrap;
+  position: relative;
+}
+.lang-seg + .lang-seg { border-left: 1px solid var(--border); }
+.lang-seg .seg-index { font-size: 0.55rem; opacity: 0.45; font-variant-numeric: tabular-nums; }
+.lang-seg .seg-label { line-height: 1; }
+.lang-seg.is-active { color: var(--text); border-bottom-color: var(--swiss-accent); }
+.lang-seg.is-active .seg-index { color: var(--swiss-accent); opacity: 1; }
+.lang-seg:hover:not(.is-active) { color: var(--text-dim); border-bottom-color: var(--border); }
+.lang-seg:focus-visible { outline: 1px solid var(--swiss-accent); outline-offset: -1px; }
+
+/* ===== 4x4 数据流矩阵头像 ===== */
+.avatar-container {
+  width: clamp(80px, 10vw, 120px); 
+  height: clamp(80px, 10vw, 120px); 
+  border: 1px solid var(--panel-color);
+  clip-path: polygon(15px 0, 100% 0, 100% calc(100% - 15px), calc(100% - 15px) 100%, 0 100%, 0 15px);
+  position: relative; flex-shrink: 0; background: #000;
+  padding: 10px;
+  transition: border-color 0.3s;
+}
+.avatar-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: repeat(4, 1fr);
+  gap: 4px;
+  width: 100%; height: 100%;
+}
+.avatar-cell {
+  width: 100%; height: 100%;
+  background: var(--f-works);
+  opacity: 0.06;
+  border-radius: 1px;
+  transition: opacity 0.7s ease;
+}
+.avatar-cell.active {
+  opacity: 1;
+  animation: dataBreathe 4s ease-in-out infinite alternate;
+}
+@keyframes dataBreathe {
+  0%   { box-shadow: 0 0 6px var(--f-works); }
+  100% { box-shadow: 0 0 16px var(--f-works), inset 0 0 4px var(--f-works); }
+}
+
+/* ===== 名言 ===== */
+.quote-text {
+  font-family: var(--font-terminal);
+  font-size: clamp(1.2rem, 1.5vw, 1.6rem);
+  color: var(--f-contact);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  display: inline-block;
+}
+
+/* ===== 三态语言切换 ===== */
+.toggle-lang { display: inline-grid; align-items: center; vertical-align: middle; }
+.toggle-lang .en, .toggle-lang .zh {
+  grid-area: 1 / 1; 
+  transition: opacity 0.15s steps(1, end);
+}
+.toggle-lang .zh { 
+  opacity: 0; 
+  pointer-events: none; 
+  font-family: var(--font-cn);
+}
+
+/* 默认模式：桌面端悬停预览中文 */
+@media (hover: hover) {
+  .panel[data-panel-lang="default"]:hover .toggle-lang .en { opacity: 0; pointer-events: none; }
+  .panel[data-panel-lang="default"]:hover .toggle-lang .zh { opacity: 1; pointer-events: auto; }
+}
+/* 触屏：default 模式下点击面板切换预览 */
+.panel[data-panel-lang="default"].active .toggle-lang .en { opacity: 0; pointer-events: none; }
+.panel[data-panel-lang="default"].active .toggle-lang .zh { opacity: 1; pointer-events: auto; }
+
+/* 显式 EN */
+[data-panel-lang="en"] .toggle-lang .en { opacity: 1 !important; pointer-events: auto !important; }
+[data-panel-lang="en"] .toggle-lang .zh { opacity: 0 !important; pointer-events: none !important; }
+/* 显式 ZH */
+[data-panel-lang="zh"] .toggle-lang .en { opacity: 0 !important; pointer-events: none !important; }
+[data-panel-lang="zh"] .toggle-lang .zh { opacity: 1 !important; pointer-events: auto !important; }
+
+/* ===== 排版 ===== */
+.label {
+  font-family: var(--font-terminal); 
+  font-size: clamp(1.1rem, 1.2vw, 1.4rem); 
+  color: var(--panel-color); 
+  text-transform: uppercase; 
+  letter-spacing: 0.1em;
+  display: block; 
+  transition: color 0.2s steps(2, end);
+}
+.label::before { content: "[ "; color: var(--text-dim-dark); }
+.label::after { content: " ]"; color: var(--text-dim-dark); }
+
+h1, h2 {
+  font-family: var(--font-head); 
+  font-weight: 700; 
+  text-transform: uppercase;
+  letter-spacing: -0.02em; 
+  color: #fff; 
+  line-height: 0.95;
+}
+h1 { font-size: var(--fluid-h1); margin-bottom: 1rem; }
+h2 { font-size: var(--fluid-h2); margin-bottom: 1rem; }
+
+p { 
+  font-family: var(--font-mono); 
+  font-size: var(--fluid-p); 
+  color: var(--text-dim); 
+  max-width: 65ch; 
+  line-height: 1.7; 
+  margin-bottom: 1.5rem; 
+}
+
+/* ===== 数据网格 ===== */
+.data-grid {
+  display: grid; 
+  grid-template-columns: 1fr 1fr; 
+  gap: 1.5rem;
+  border-top: 1px solid var(--border); 
+  padding-top: 1.5rem; 
+  margin-top: 1.5rem; 
+}
+.data-item { display: flex; flex-direction: column; gap: 2px; }
+.data-item .key {
+  font-family: var(--font-terminal); 
+  font-size: 0.95rem; 
+  color: var(--text-dim-dark);
+  text-transform: uppercase; 
+  letter-spacing: 0.1em;
+}
+.data-item .value {
+  font-family: var(--font-terminal); 
+  font-size: clamp(1.5rem, 2vw, 2.2rem); 
+  color: var(--panel-color); 
+  transition: color 0.2s steps(2, end);
+}
+
+/* ===== 技能列表 ===== */
+.skill-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+.skill-item {
+  border-left: 1px solid var(--panel-color);
+  padding-left: 1rem;
+}
+.skill-title.toggle-lang {
+  display: inline-grid;
+  justify-content: start;
+  font-family: var(--font-head);
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--panel-color);
+  margin-bottom: 2px;
+  letter-spacing: 0.02em;
+}
+.skill-desc.toggle-lang {
+  display: inline-grid;
+  justify-content: start;
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: var(--text-dim);
+  margin: 0;
+  text-align: left;
+  max-width: 100%;
+}
+
+/* ===== 标签 ===== */
+.competency-list {
+  display: flex; flex-wrap: wrap; gap: 6px; margin-top: 1rem; list-style: none;
+}
+.competency-list li {
+  font-family: var(--font-terminal); font-size: 1.1rem; padding: 2px 10px;
+  border: 1px solid var(--border); color: var(--text-dim); 
+  background: rgba(0,0,0,0.5); text-transform: uppercase; 
+  transition: all 0.2s steps(2, end);
+}
+.panel:hover .competency-list li { border-color: var(--panel-color); color: var(--panel-color); }
+
+/* ===== 动态系统日志（支持中英文与滚动条） ===== */
+.sys-log-box {
+  background: #000; 
+  border-left: 1px solid var(--border);
+  padding: 10px 15px; 
+  margin-top: 1.5rem; 
+  font-family: var(--font-terminal);
+  font-size: 1.2rem; 
+  color: var(--text-dim); 
+  height: 140px; 
+  overflow-y: auto; 
+  position: relative;
+}
+/* 滚动条样式定制 */
+.sys-log-box::-webkit-scrollbar {
+  width: 4px;
+}
+.sys-log-box::-webkit-scrollbar-track {
+  background: #111;
+}
+.sys-log-box::-webkit-scrollbar-thumb {
+  background: var(--panel-color);
+  border-radius: 2px;
+}
+.sys-log-line { margin-bottom: 4px; line-height: 1.4; display: block; }
+.sys-log-line span.highlight { color: var(--panel-color); }
+
+/* ===== 按钮 ===== */
+.action-btn {
+  display: inline-block; padding: 8px 20px; margin-top: 1.5rem;
+  background: transparent; border: 1px solid var(--panel-color);
+  color: var(--panel-color); font-family: var(--font-terminal);
+  font-size: 1.2rem; text-transform: uppercase; letter-spacing: 0.15em;
+  text-decoration: none; position: relative; overflow: hidden;
+  transition: all 0.15s steps(2, end);
+  clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+  cursor: pointer;
+}
+.action-btn:hover { background: var(--panel-color); color: #000; box-shadow: 0 0 15px var(--panel-color); }
+.action-btn .toggle-lang { width: 100%; text-align: center; }
+
+/* ===== 联系方式卡片 ===== */
+.contact-grid {
+  display: grid; 
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem; 
+  margin-top: 1.5rem; 
+  width: 100%;
+}
+.contact-card {
+  display: flex; flex-direction: column; justify-content: center;
+  padding: 1rem 1.25rem; border: 1px solid var(--border);
+  background: rgba(0, 0, 0, 0.4); text-decoration: none; position: relative;
+  transition: all 0.15s steps(2, end);
+  clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+}
+.contact-card .card-id { font-family: var(--font-terminal); font-size: 1rem; color: var(--text-dim-dark); margin-bottom: 2px; }
+.contact-card .card-name { font-family: var(--font-terminal); font-size: 1.4rem; color: var(--f-contact-panel); text-transform: uppercase; letter-spacing: 0.05em; transition: color 0.15s steps(2, end); }
+.contact-card .card-value { font-family: var(--font-mono); font-size: 0.85rem; color: var(--text-dim); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.contact-card:hover, .contact-card:focus-visible { background: var(--f-contact-panel); border-color: var(--f-contact-panel); }
+.contact-card:hover .card-name, .contact-card:hover .card-value, .contact-card:hover .card-id,
+.contact-card:focus-visible .card-name, .contact-card:focus-visible .card-value, .contact-card:focus-visible .card-id { color: #000; }
+
+/* ===== 页脚 ===== */
+footer {
+  text-align: center; padding: 3rem 1.5rem; font-family: var(--font-terminal);
+  font-size: 1.2rem; color: var(--text-dim-dark); text-transform: uppercase;
+  letter-spacing: 0.15em; background: #000; position: relative; z-index: 10;
+}
+
+/* ===== 内嵌面板 HUD ===== */
+.panel-inner-hud {
+  display: flex; flex-wrap: wrap; justify-content: space-between; gap: 1rem;
+  margin-top: 2rem; padding-top: 1.5rem; border-top: 1px dashed rgba(255, 255, 255, 0.08);
+  font-family: var(--font-terminal); user-select: none;
+}
+.inner-telemetry-group { display: flex; flex-wrap: wrap; gap: 1.5rem; }
+.inner-metric { display: flex; flex-direction: column; gap: 1px; }
+.inner-metric .m-key { font-size: 0.9rem; color: var(--text-dim-dark); letter-spacing: 0.08em; text-transform: uppercase; }
+.inner-metric .m-val { font-size: 1.3rem; color: var(--panel-color); letter-spacing: 0.05em; transition: color 0.2s steps(2, end); }
+.inner-metric .m-val.m-warning { color: var(--f-contact); animation: blink 1s step-end infinite; }
+.inner-note { font-size: 1rem; color: var(--text-dim-dark); text-transform: uppercase; letter-spacing: 0.15em; align-self: flex-end; }
+.inner-pixel-array { display: grid; grid-template-columns: repeat(4, 10px); gap: 2px; align-self: flex-end; margin-left: auto; }
+.inner-pixel-cell { width: 10px; height: 10px; background: rgba(255, 255, 255, 0.05); transition: background 0.15s steps(2, end); }
+
+/* ===== 项目终端卡片 ===== */
+.project-card {
+  background: rgba(0,0,0,0.6); border: 1px solid var(--border);
+  border-top: 2px solid var(--panel-color); padding: 1.5rem; 
+  display: flex; flex-direction: column;
+  transition: all 0.3s;
+}
+.project-card:hover {
+  border-color: var(--panel-color);
+  box-shadow: 0 0 15px rgba(57, 255, 20, 0.1);
+}
+.project-card h3 {
+  font-family: var(--font-head); color: #fff; font-size: 1.3rem; margin-bottom: 0.5rem;
+}
+.project-tags {
+  display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 1rem;
+}
+.project-tag {
+  font-family: var(--font-terminal); font-size: 0.85rem; 
+  border: 1px solid var(--border); padding: 1px 6px; color: var(--text-dim);
+  background: rgba(255,255,255,0.05);
+}
+.project-terminal {
+  background: #000; padding: 1rem; border-left: 1px solid var(--panel-color);
+  font-family: var(--font-mono); font-size: 0.8rem; line-height: 1.7; color: var(--text-dim);
+  flex-grow: 1;
+}
+.project-terminal span.keyword {
+  color: var(--panel-color); font-weight: bold;
+}
+
+/* ===== 弹窗 ===== */
+#game-modal {
+  position: fixed; inset: 0; background: rgba(5, 5, 5, 0.95);
+  z-index: 10000; display: none; justify-content: center; align-items: center;
+  backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px);
+}
+#game-modal.active { display: flex; }
+.modal-content {
+  width: 90%; max-width: 1000px; max-height: 85vh;
+  background: #0a0a0a; border: 1px solid var(--f-games);
+  padding: var(--fluid-pad); overflow-y: auto; position: relative;
+  font-family: var(--font-mono); color: var(--text-dim); font-size: 0.9rem;
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 20px), calc(100% - 20px) 100%, 0 100%);
+  box-shadow: 0 0 30px rgba(255, 85, 0, 0.1) inset;
+}
+.modal-content::-webkit-scrollbar { width: 6px; }
+.modal-content::-webkit-scrollbar-track { background: #000; }
+.modal-content::-webkit-scrollbar-thumb { background: var(--f-games); }
+.modal-header {
+  display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.5rem;
+}
+.modal-content h3 { color: var(--f-games); font-family: var(--font-terminal); font-size: 1.8rem; border-bottom: 1px dashed var(--border); padding-bottom: 0.5rem; }
+.close-btn {
+  cursor: pointer; color: var(--f-contact); font-family: var(--font-terminal); font-size: 1.1rem;
+  border: 1px solid var(--f-contact); padding: 2px 10px; background: transparent;
+  transition: all 0.15s steps(2, end);
+}
+.close-btn:hover { background: var(--f-contact); color: #000; }
+.modal-section { margin-bottom: 2rem; }
+.modal-section h4 { color: #fff; font-family: var(--font-terminal); font-size: 1.3rem; margin-bottom: 0.5rem; }
+.modal-content ul { list-style: none; display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 4px; }
+.modal-content li { display: flex; justify-content: space-between; border-bottom: 1px solid #1a1a1a; padding-bottom: 2px; }
+.modal-content li span.val { color: var(--f-games); font-family: var(--font-terminal); font-size: 1rem; }
+
+/* ===== 首屏专属 ===== */
+.profile-header {
+  display: flex; align-items: center; gap: 1.5rem; margin-bottom: 2rem;
+}
+.profile-content {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; align-items: start;
+}
+.profile-content .quote-block {
+  padding-left: 1rem; border-left: 1px solid var(--f-contact); margin: 0;
+}
+.profile-content p {
+  text-align: right; margin: 0; max-width: 100% !important;
+}
+
+/* ===== 加密扇区面板 ===== */
+.panel.encrypted {
+  --panel-color: var(--marathon-red);
+  --hover-color: var(--marathon-red);
+  border: 1px solid rgba(255, 42, 42, 0.2);
+}
+.panel.encrypted:hover {
+  filter: none;
+  box-shadow: inset 0 0 20px rgba(255, 42, 42, 0.05);
+}
+.enc-lock {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-family: var(--font-mono); font-size: 0.6rem;
+  letter-spacing: 0.18em; color: var(--marathon-red);
+  text-transform: uppercase;
+}
+.enc-lock-dot {
+  width: 5px; height: 5px; background: var(--marathon-red);
+  border-radius: 0; animation: encPulseRed 1.6s ease-in-out infinite;
+}
+@keyframes encPulseRed {
+  0%, 100% { opacity: 0.25; transform: scale(0.9); }
+  50%      { opacity: 1; transform: scale(1.1); box-shadow: 0 0 10px var(--marathon-red); }
+}
+.enc-grid {
+  display: grid; grid-template-columns: 1fr; gap: 1rem;
+  margin-top: 1.5rem; border-top: 1px solid rgba(255, 42, 42, 0.15);
+  position: relative;
+}
+.enc-cipher {
+  padding: 1rem 0; border-bottom: 1px solid rgba(255, 42, 42, 0.15);
+  display: flex; flex-direction: column; gap: 4px; overflow: hidden; position: relative;
+}
+.enc-cipher-line {
+  font-family: var(--font-terminal); font-size: clamp(0.9rem, 1.2vw, 1.2rem);
+  line-height: 1.15; letter-spacing: 0.08em; color: var(--marathon-red);
+  white-space: nowrap; opacity: 0.35; user-select: none; transition: opacity 0.3s ease;
+}
+.enc-cipher-line:nth-child(2) { animation: glitchShift 4s infinite steps(1); }
+.enc-cipher-line:nth-child(3) { animation: glitchShift 6s infinite steps(1) reverse; }
+
+@keyframes glitchShift {
+  0%, 95%, 100% { transform: translateX(0); opacity: 0.35; }
+  96% { transform: translateX(-2px); opacity: 0.5; }
+  97% { transform: translateX(2px); opacity: 0.25; }
+  98% { transform: translateX(0); opacity: 0.45; }
+}
+
+.enc-cipher-line--hash {
+  margin-top: 8px; font-family: var(--font-mono); font-size: 0.6rem;
+  letter-spacing: 0.12em; color: var(--marathon-red); opacity: 1;
+  border-top: 1px dashed rgba(255, 42, 42, 0.3); padding-top: 6px;
+}
+.enc-meta {
+  padding: 1rem 0; display: flex; flex-direction: row; flex-wrap: wrap; gap: 1rem;
+}
+.enc-meta-item { display: flex; flex-direction: column; gap: 1px; }
+.enc-meta-key {
+  font-family: var(--font-mono); font-size: 0.5rem; letter-spacing: 0.2em;
+  color: rgba(255, 42, 42, 0.5); text-transform: uppercase;
+}
+.enc-meta-val {
+  font-family: var(--font-terminal); font-size: 1.1rem; letter-spacing: 0.1em;
+  color: var(--text-dim); text-transform: uppercase;
+}
+.enc-foot {
+  margin-top: 1rem; padding-top: 0.75rem; border-top: 1px solid rgba(255, 42, 42, 0.15);
+  font-family: var(--font-mono); font-size: 0.55rem; letter-spacing: 0.16em;
+  color: rgba(255, 42, 42, 0.4); text-transform: uppercase;
+}
+.enc-scan-line {
+  position: absolute; top: 0; left: 0; width: 100%; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--marathon-red), transparent);
+  opacity: 0.4; animation: scanMove 4s linear infinite; pointer-events: none;
+}
+@keyframes scanMove {
+  0% { transform: translateY(0); opacity: 0; }
+  10% { opacity: 0.5; }
+  90% { opacity: 0.5; }
+  100% { transform: translateY(120px); opacity: 0; }
+}
+
+@media (min-width: 1100px) {
+  .panel.span-wide .enc-grid { grid-template-columns: 5fr 7fr; }
+  .panel.span-wide .enc-cipher {
+    border-bottom: none; border-right: 1px solid rgba(255, 42, 42, 0.15); padding-right: 1rem;
+  }
+  .panel.span-wide .enc-meta { padding-left: 1.5rem; flex-direction: column; }
+}
+
+/* ===== 响应式补充 ===== */
+@media (max-width: 900px) {
+  .profile-content { grid-template-columns: 1fr; gap: 1.5rem; }
+  .profile-content .quote-block { border-left: none; border-top: 1px dashed var(--border); padding-top: 1rem; padding-left: 0; }
+  .profile-content p { text-align: left !important; }
+}
+
+@media (max-width: 767px) {
+  .grid { gap: 2px; }
+  .status-bar { flex-direction: column; gap: 4px; text-align: center; padding: 8px; }
+  .status-bar .left, .status-bar .right { justify-content: center; width: 100%; }
+  .data-grid { grid-template-columns: 1fr; gap: 1rem; }
+  .profile-header { flex-direction: column; text-align: center; gap: 1rem; margin-bottom: 1.5rem; }
+  h1 { text-align: center; }
+  h1 br { display: none; }
+  .contact-grid { grid-template-columns: 1fr; }
+  .inner-telemetry-group { gap: 1rem; }
+  .inner-pixel-array { margin-left: 0; }
+  .modal-content ul { grid-template-columns: 1fr; }
+  .works-grid { grid-template-columns: 1fr !important; gap: 1rem !important; }
+}
+</style>
+</head>
+<body>
+
+<!-- 顶部状态栏 -->
+<div class="status-bar" id="top-status-bar">
+  <div class="left">
+    <span>SYS.STATUS: <span class="blink">●</span> ONLINE</span>
+    <span>LOC: UNKNOWN 404 NOT FOUND /</span>
+  </div>
+  <div class="right">
+    <span id="clock">--:--:--</span>
+  </div>
+</div>
+
+<main class="grid">
+  <!-- 1. 欢迎面板 (12列) -->
+  <div class="panel span-full" data-reveal data-panel-lang="default">
+    <div class="panel-topbar" style="border-bottom: 1px solid var(--border); padding-bottom: 0.75rem; margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center;">
+      <span style="font-family: var(--font-terminal); font-size: 1.4rem; color: var(--panel-color); text-transform: uppercase; letter-spacing: 0.1em; display: flex; align-items: center;">
+        <span class="toggle-lang" style="text-align: left;">
+          <span class="en" style="line-height: 1; white-space: nowrap;">
+            <span style="color: var(--text-dim-dark);">[</span> PERSONAL INFORMATION <span style="color: var(--text-dim-dark);">]</span>
+          </span>
+          <span class="zh" style="line-height: 1; white-space: nowrap;">
+            <span style="color: var(--text-dim-dark);">[</span> 个人信息 <span style="color: var(--text-dim-dark);">]</span>
+          </span>
+        </span>
+      </span>
+      <div class="panel-topbar-right" style="display: flex; align-items: center; gap: 1rem;">
+        <span style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-dim-dark); letter-spacing: 0.15em;">[ SYS.PROFILE ]</span>
+        <div class="panel-lang-switch" role="group" aria-label="Panel language">
+          <button class="lang-seg is-active" data-lang="default"><span class="seg-index">00</span><span class="seg-label">EC</span></button>
+          <button class="lang-seg" data-lang="en"><span class="seg-index">01</span><span class="seg-label">EN</span></button>
+          <button class="lang-seg" data-lang="zh"><span class="seg-index">02</span><span class="seg-label">中</span></button>
+        </div>
+      </div>
+    </div>
+
+    <div class="profile-header">
+      <div class="avatar-container">
+        <div class="avatar-grid" id="avatar-grid"></div>
+      </div>
+      
+      <h1 style="margin-bottom: 0;">
+        <span class="toggle-lang" style="display: inline-grid;">
+          <span class="en">HONGLIN JIA</span>
+          <span class="zh">贾弘林</span>
+        </span>
+        <br>
+        <span style="color: var(--swiss-accent);" class="toggle-lang">
+          <span class="en">RECON, SENSING & ANALYSIS</span>
+          <span class="zh">侦察 · 感知 & 分析</span>
+        </span>
+      </h1>
+    </div>
+
+    <div class="profile-content">
+      <div class="quote-block toggle-lang">
+        <span class="en quote-text">> FINDING PATTERNS IN CHAOS_</span>
+        <span class="zh quote-text">> 在混乱中寻找规律_</span>
+      </div>
+      <p class="toggle-lang">
+        <span class="en">7 YEARS OF OVERSEAS STUDY, MASTER OF INFORMATION SYSTEMS. DEEP INTEGRATION OF MULTI-AGENT AI WORKFLOWS, MULTI-LINGUAL CROSS-CULTURAL COMMUNICATION. A CURIOSITY-DRIVEN GAMER, OBSERVER, AND RESEARCHER.</span>
+        <span class="zh">7年海外留学经历，信息系统管理硕士。多AI辅助工作、多语言跨文化交流。好奇心驱使的玩家，也是观察与研究者。</span>
+      </p>
+    </div>
+
+    <div style="display: flex; gap: 4px; margin-top: 2rem;">
+      <span style="width: 32px; height: 6px; background: var(--f-journey);"></span>
+      <span style="width: 32px; height: 6px; background: var(--f-music);"></span>
+      <span style="width: 32px; height: 6px; background: var(--f-games);"></span>
+      <span style="width: 32px; height: 6px; background: var(--f-works);"></span>
+      <span style="width: 32px; height: 6px; background: var(--f-contact-panel);"></span>
+    </div>
+  </div>
+
+  <!-- 2. 学术经历 (7列) -->
+  <div class="panel journey" data-reveal data-panel-lang="default">
+    <div class="panel-head-row">
+      <span class="label">CODE: a</span>
+      <div class="panel-lang-switch" role="group" aria-label="Panel language">
+        <button class="lang-seg is-active" data-lang="default"><span class="seg-index">00</span><span class="seg-label">EC</span></button>
+        <button class="lang-seg" data-lang="en"><span class="seg-index">01</span><span class="seg-label">EN</span></button>
+        <button class="lang-seg" data-lang="zh"><span class="seg-index">02</span><span class="seg-label">中</span></button>
+      </div>
+    </div>
+    <h2 class="toggle-lang"><span class="en">ACADEMIC EXPERIENCE</span><span class="zh">学术经历</span></h2>
+    <p class="toggle-lang">
+      <span class="en">BELARUSIAN STATE UNIVERSITY (BSU) - MASTER OF INFORMATION SYSTEMS / BACHELOR OF APPLIED INFORMATICS. THESIS: GAIT ANALYSIS & VISUALIZATION VIA 3D SKELETON RECONSTRUCTION.</span>
+      <span class="zh">白俄罗斯国立大学 (BSU) - 信息系统管理硕士/ 应用信息学本科。硕士论文：《人体步态分析》通过3D骨骼重建步态来进行可视化分析。</span>
+    </p>
+    
+    <div style="margin-bottom: 1rem;">
+      <span class="key toggle-lang" style="font-family: var(--font-terminal); font-size: 1rem; color: var(--text-dim-dark); text-transform: uppercase;">
+        <span class="en">MAIN COURSES</span>
+        <span class="zh">主要课程</span>
+      </span>
+      <ul class="competency-list">
+        <li><span class="toggle-lang"><span class="en">Data Modeling & DB Systems (5)</span><span class="zh">数据模型与数据库系统 (5)</span></span></li>
+        <li><span class="toggle-lang"><span class="en">Python Programming</span><span class="zh">Python编程</span></span></li>
+        <li><span class="toggle-lang"><span class="en">Computational Methods (7)</span><span class="zh">计算方法 (7)</span></span></li>
+        <li><span class="toggle-lang"><span class="en">HCI Design (5)</span><span class="zh">人机界面设计 (5)</span></span></li>
+        <li><span class="toggle-lang"><span class="en">R Language Data Vis (10)</span><span class="zh">R语言数据可视化 (10)</span></span></li>
+        <li><span class="toggle-lang"><span class="en">Multivariate Statistical Analysis (7)</span><span class="zh">多元统计分析 (7)</span></span></li>
+        <li><span class="toggle-lang"><span class="en">Data Analysis Software (8)</span><span class="zh">数据分析软件 (8)</span></span></li>
+      </ul>
+    </div>
+
+    <div class="sys-log-box" id="sys-log"></div>
+
+    <div class="data-grid">
+      <div class="data-item">
+        <span class="key toggle-lang"><span class="en">EDU YEARS</span><span class="zh">求学时长</span></span>
+        <span class="value">7</span>
+      </div>
+      <div class="data-item">
+        <span class="key toggle-lang"><span class="en">UNIVERSITY</span><span class="zh">毕业院校</span></span>
+        <span class="value">BSU</span>
+      </div>
+    </div>
+    
+    <div class="panel-inner-hud">
+      <div class="inner-telemetry-group">
+        <div class="inner-metric"><span class="m-key">EXP_CORE</span><span class="m-val">07,432 H</span></div>
+        <div class="inner-metric"><span class="m-key">SYNC_RATE</span><span class="m-val" id="exp-sync">99.82%</span></div>
+        <div class="inner-metric"><span class="m-key">THESIS</span><span class="m-val m-warning" id="exp-risk">ONGOING</span></div>
+      </div>
+      <div class="inner-note">CLEARANCE_LEVEL: ALPHA</div>
+      <div class="inner-pixel-array" data-pixels>
+        <div class="inner-pixel-cell"></div><div class="inner-pixel-cell"></div><div class="inner-pixel-cell"></div><div class="inner-pixel-cell"></div>
+        <div class="inner-pixel-cell"></div><div class="inner-pixel-cell"></div><div class="inner-pixel-cell"></div><div class="inner-pixel-cell"></div>
+        <div class="inner-pixel-cell"></div><div class="inner-pixel-cell"></div><div class="inner-pixel-cell"></div><div class="inner-pixel-cell"></div>
+        <div class="inner-pixel-cell"></div><div class="inner-pixel-cell"></div><div class="inner-pixel-cell"></div><div class="inner-pixel-cell"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. 个人技能 (5列) -->
+  <div class="panel music" data-reveal data-panel-lang="default">
+    <div class="panel-head-row">
+      <span class="label">CODE: b</span>
+      <div class="panel-lang-switch" role="group" aria-label="Panel language">
+        <button class="lang-seg is-active" data-lang="default"><span class="seg-index">00</span><span class="seg-label">EC</span></button>
+        <button class="lang-seg" data-lang="en"><span class="seg-index">01</span><span class="seg-label">EN</span></button>
+        <button class="lang-seg" data-lang="zh"><span class="seg-index">02</span><span class="seg-label">中</span></button>
+      </div>
+    </div>
+    <h2 class="toggle-lang"><span class="en">PERSONAL SKILLS</span><span class="zh">个人技能</span></h2>
+    
+    <div class="skill-list">
+      <div class="skill-item">
+        <div class="skill-title toggle-lang">
+          <span class="en">USER RESEARCH</span>
+          <span class="zh">用户研究方法</span>
+        </div>
+        <p class="skill-desc toggle-lang">
+          <span class="en">Proficient in content analysis, stratified sampling design, and qualitative data analysis. Skilled at extracting market trends and risk signals from feedback, translating complex data into clear business narratives.</span>
+          <span class="zh">熟练掌握内容分析法、分层抽样设计、定性数据分析等方法；了解问卷调查、用户访谈等用研方法。擅长从反馈结果中提炼市场趋势与风险信号，将复杂数据转化为清晰的商业叙事。</span>
+        </p>
+      </div>
+
+      <div class="skill-item">
+        <div class="skill-title toggle-lang">
+          <span class="en">DATA MODELING</span>
+          <span class="zh">数据建模与分析</span>
+        </div>
+        <p class="skill-desc toggle-lang">
+          <span class="en">Proficient in Excel, Python, R for descriptive statistics, cross-analysis, and data visualization. Familiar with Oracle/SQL databases. Capable of extracting business insights from raw data.</span>
+          <span class="zh">熟练运用Excel、Python、R进行描述性统计、交叉分析与数据可视化。熟悉Oracle、SQL数据库，具备从原始数据提炼业务洞察的能力。</span>
+        </p>
+      </div>
+
+      <div class="skill-item">
+        <div class="skill-title toggle-lang">
+          <span class="en">AI-ASSISTED UX</span>
+          <span class="zh">AI辅助用研</span>
+        </div>
+        <p class="skill-desc toggle-lang">
+          <span class="en">Deep integration of AI workflows, utilizing multiple AI Agents simultaneously to boost efficiency. Capable of critically evaluating human-AI collaborative outputs.</span>
+          <span class="zh">深度集成AI工作流，擅长同时利用多个AI Agent混合辅助工作，可大幅提升工作效率；具备对人机协同输出进行批判性评估的能力。</span>
+        </p>
+      </div>
+
+      <div class="skill-item">
+        <div class="skill-title toggle-lang">
+          <span class="en">MULTI-CULTURAL</span>
+          <span class="zh">语言与跨文化研究</span>
+        </div>
+        <p class="skill-desc toggle-lang">
+          <span class="en">7 years of overseas study, proficient in Russian. Can independently conduct overseas literature research and localized user communication, supporting international product research.</span>
+          <span class="zh">7年海外留学经历，掌握俄语，可独立完成海外文献调研与本地化用户沟通，为国际化产品用研提供支持。</span>
+        </p>
+      </div>
+    </div>
+
+    <div class="panel-inner-hud">
+      <div class="inner-telemetry-group">
+        <div class="inner-metric"><span class="m-key">CPU_LOAD</span><span class="m-val" id="skills-cpu">42.8%</span></div>
+        <div class="inner-metric"><span class="m-key">THROUGHPUT</span><span class="m-val" id="skills-thru">1.8 GB/S</span></div>
+        <div class="inner-metric"><span class="m-key">LANG</span><span class="m-val">RU / EN / CN</span></div>
+      </div>
+      <div class="inner-note">MODULE_SYNC: ACTIVE</div>
+      <div class="inner-pixel-array" data-pixels>
+        <div class="inner-pixel-cell"></div><div class="inner-pixel-cell"></div><div class="inner-pixel-cell"></div><div class="inner-pixel-cell"></div>
+        <div class="inner-pixel-cell"></div><div class="inner-pixel-cell"></div><div class="inner-pixel-cell"></div><div class="inner-pixel-cell"></div>
+        <div class="inner-pixel-cell"></div><div class="inner-pixel-cell"></div><div class="inner-pixel-cell"></div><div class="inner-pixel-cell"></div>
+        <div class="inner-pixel-cell"></div><div class="inner-pixel-cell"></div><div class="inner-pixel-cell"></div><div class="inner-pixel-cell"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. 游戏经历 (7列) -->
+  <div class="panel games" data-reveal data-panel-lang="default">
+    <div class="panel-head-row">
+      <span class="label">CODE: c</span>
+      <div class="panel-lang-switch" role="group" aria-label="Panel language">
+        <button class="lang-seg is-active" data-lang="default"><span class="seg-index">00</span><span class="seg-label">EC</span></button>
+        <button class="lang-seg" data-lang="en"><span class="seg-index">01</span><span class="seg-label">EN</span></button>
+        <button class="lang-seg" data-lang="zh"><span class="seg-index">02</span><span class="seg-label">中</span></button>
+      </div>
+    </div>
+    <h2 class="toggle-lang"><span class="en">GAME EXPERIENCE</span><span class="zh">游戏经历</span></h2>
+    
+    <p class="toggle-lang">
+      <span class="en">OVER 10,000+ HOURS ACROSS MULTI-PLATFORMS (PC / PS / SWITCH / MOBILE). MULTI-GENRE ENTHUSIAST, SYSTEMS ANALYST, COMMUNITY RESEARCHER. DEEP UNDERSTANDING OF CARD STRATEGY, SHOOTER, AND RPG GENRES.</span>
+      <span class="zh">全平台（PC / PS / SWITCH / MOBILE）累计超10,000小时重度游玩。多品类爱好者，系统分析师，社区研究者。对卡牌策略，射击，角色扮演等游戏品类有深刻理解。</span>
+    </p>
+    
+    <div class="data-grid" style="grid-template-columns: 1fr 1fr; row-gap: 1.5rem;">
+      <div class="data-item">
+        <span class="key toggle-lang"><span class="en">TENCENT XINYUE</span><span class="zh">腾讯心悦会员</span></span>
+        <span class="value">V2</span>
+      </div>
+      <div class="data-item">
+        <span class="key toggle-lang"><span class="en">TENCENT OG</span><span class="zh">腾讯 OG 玩家</span></span>
+        <span class="value">LV.4</span>
+      </div>
+      <div class="data-item">
+        <span class="key toggle-lang"><span class="en">TX GAME CENTER</span><span class="zh">腾讯游戏中心贵族</span></span>
+        <span class="value">LV.5</span>
+      </div>
+      <div class="data-item">
+        <span class="key toggle-lang"><span class="en">NETEASE VIP</span><span class="zh">网易超级会员</span></span>
+        <span class="value">V4</span>
+      </div>
+      <div class="data-item">
+        <span class="key toggle-lang"><span class="en">LILITH VIP</span><span class="zh">莉莉丝大会员</span></span>
+        <span class="value toggle-lang"><span class="en">SILVER MEMBER</span><span class="zh">白银</span></span>
+      </div>
+      <div class="data-item">
+        <span class="key toggle-lang"><span class="en">QQ 9.0 OFFICIAL</span><span class="zh">手机QQ 9.0 官方认证</span></span>
+        <span class="value toggle-lang"><span class="en">LIGHT CHASER</span><span class="zh">追光者</span></span>
+      </div>
+    </div>
+
+    <div style="margin-top: 1.5rem;">
+      <span class="key toggle-lang" style="font-family: var(--font-terminal); font-size: 1rem; color: var(--text-dim-dark); text-transform: uppercase;">
+        <span class="en">TOP DOSSIERS</span>
+        <span class="zh">核心档案</span>
+      </span>
+      <ul class="competency-list">
+        <li>阴阳师 // 2600DAYS+</li>
+        <li>原神 // 1477DAYS+</li>
+        <li>命运2 // 1446h</li>
+      </ul>
+    </div>
+
+    <button class="action-btn" id="open-archive-btn">
+      <span class="toggle-lang"><span class="en">ACCESS FULL ARCHIVE ↗</span><span class="zh">访问完整游戏档案 ↗</span></span>
+    </button>
+
+    <div class="panel-inner-hud">
+      <div class="inner-telemetry-group">
+        <div class="inner-metric"><span class="m-key">STEAM_LVL</span><span class="m-val">48</span></div>
+        <div class="inner-metric"><span class="m-key">PSN_TROPHY</span><span class="m-val" id="games-fps">592</span></div>
+        <div class="inner-metric"><span class="m-key">IDENTITY</span><span class="m-val m-warning">HARDCORE</span></div>
+      </div>
+      <div class="inner-note">DATA SNAPSHOT: 2026.10</div>
+      <div class="inner-pixel-array" data-pixels>
+        <div class="inner-pixel-cell"></div><div class="inner-pixel-cell"></div><div class="inner-pixel-cell"></div><div class="inner-pixel-cell"></div>
+        <div class="inner-pixel-cell"></div><div class="inner-pixel-cell"></div><div class="inner-pixel-cell"></div><div class="inner-pixel-cell"></div>
+        <div class="inner-pixel-cell"></div><div class="inner-pixel-cell"></div><div class="inner-pixel-cell"></div><div class="inner-pixel-cell"></div>
+        <div class="inner-pixel-cell"></div><div class="inner-pixel-cell"></div><div class="inner-pixel-cell"></div><div class="inner-pixel-cell"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5. 加密扇区面板 (5列) -->
+  <div class="panel encrypted" data-reveal data-panel-lang="en">
+    <div class="panel-head-row">
+      <span class="label">CODE: x</span>
+      <div class="enc-lock">
+        <span class="enc-lock-dot"></span>
+        <span class="enc-lock-text">ACCESS DENIED</span>
+      </div>
+    </div>
+
+    <h2 class="toggle-lang">
+      <span class="en">ENCRYPTED SECTOR</span>
+      <span class="zh">加密扇区</span>
+    </h2>
+
+    <div class="enc-grid">
+      <div class="enc-scan-line"></div>
+
+      <div class="enc-cipher">
+        <div class="enc-cipher-line">▓▒░ ██████ ░▒▓ ◌◌◌ ██▓▒</div>
+        <div class="enc-cipher-line">░▓█ ◌◌ ████████ ▒▒▒ ░▓█</div>
+        <div class="enc-cipher-line">██▓ ░░░░ ██ ◌◌◌◌◌ ▓▓▒▒</div>
+        <div class="enc-cipher-line">◌◌◌ ██████ ▓▓▓ ░░ ████</div>
+        <div class="enc-cipher-line enc-cipher-line--hash" id="enc-hash">0x7F3A...E9C1</div>
+      </div>
+
+      <div class="enc-meta">
+        <div class="enc-meta-item">
+          <span class="enc-meta-key">CLEARANCE</span>
+          <span class="enc-meta-val">OMEGA</span>
+        </div>
+        <div class="enc-meta-item">
+          <span class="enc-meta-key">SIGNAL</span>
+          <span class="enc-meta-val">ENCRYPTED</span>
+        </div>
+        <div class="enc-meta-item">
+          <span class="enc-meta-key">SECTOR</span>
+          <span class="enc-meta-val">X-09</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="enc-foot">
+      <span>> DATA STREAM ACTIVE // CONTENTS REDACTED</span>
+    </div>
+  </div>
+
+  <!-- 6. 项目作品 (12列) -->
+  <div class="panel works span-full" data-reveal data-panel-lang="default">
+    <div class="panel-head-row">
+      <span class="label">CODE: d</span>
+      <div class="panel-lang-switch" role="group" aria-label="Panel language">
+        <button class="lang-seg is-active" data-lang="default"><span class="seg-index">00</span><span class="seg-label">EC</span></button>
+        <button class="lang-seg" data-lang="en"><span class="seg-index">01</span><span class="seg-label">EN</span></button>
+        <button class="lang-seg" data-lang="zh"><span class="seg-index">02</span><span class="seg-label">中</span></button>
+      </div>
+    </div>
+    <h2 class="toggle-lang"><span class="en">PROJECTS</span><span class="zh">项目作品</span></h2>
+    
+    <div class="works-grid">
+      <div class="project-card">
+        <h3 class="toggle-lang">
+          <span class="en">ACGN COMMUNITY SENTIMENT ANALYSIS</span>
+          <span class="zh">二次元游戏社区舆情对比研究</span>
+        </h3>
+        <div class="project-tags">
+          <span class="project-tag toggle-lang"><span class="en">SOLO</span><span class="zh">单人</span></span>
+          <span class="project-tag toggle-lang"><span class="en">AI ASSISTED</span><span class="zh">AI辅助</span></span>
+          <span class="project-tag toggle-lang"><span class="en">MIXED METHODS</span><span class="zh">混合研究</span></span>
+          <span class="project-tag toggle-lang"><span class="en">COMPETITOR INSIGHT</span><span class="zh">竞品洞察</span></span>
+          <span class="project-tag toggle-lang"><span class="en">PIPELINE CREATION</span><span class="zh">完整工作流创建</span></span>
+          <span class="project-tag">2026.07 - 2026.08</span>
+        </div>
+        <div class="project-terminal toggle-lang">
+          <span class="en">
+            <span class="keyword">> TARGET:</span> Analyze Bilibili comments of "Genshin Impact", "Wuthering Waves", and "Endfield" to build competitor user profiles and capture pain points.<br>
+            <span class="keyword">> METHOD:</span> Sampled 2199 comments for thematic visualization. Stratified sampling of 240 comments for human-AI hybrid validation (154 manual, 86 dictionary, 43 unencoded).<br>
+            <span class="keyword">> INSIGHT:</span> Quantified community ecology differences. Genshin (positive story discussions); Wuthering Waves (character/audio-visual focus, negative system optimization); Endfield (character art/story/monetization with negative feedback).<br>
+            <span class="keyword">> OUTPUT:</span> Encapsulated data cleaning→coding→statistics pipeline into a reusable analysis workbench using Cursor. Validated AI efficiency in UX research.
+          </span>
+          <span class="zh">
+            <span class="keyword">> 目标:</span> 通过对《原神》《鸣潮》《终末地》B站视频评论区，快速构建竞品用户画像与核心诉求对比。<br>
+            <span class="keyword">> 方法:</span> 取样2199条评论并主题可视化。分层抽样240条进行人机混合校验（有效标注240，人工154，词典86，无法编码43）。<br>
+            <span class="keyword">> 洞察:</span> 量化验证竞品差异。《原神》剧情正面讨论极高；《鸣潮》侧重角色视听但系统优化存负面；《终末地》角色美术/剧情/商业化伴随负面。<br>
+            <span class="keyword">> 产出:</span> 利用Cursor将清洗→编码→统计封装为可复用分析工作台，验证AI提效可行性，具备极高拓展空间。
+          </span>
+        </div>
+      </div>
+
+      <div class="project-card">
+        <h3 class="toggle-lang">
+          <span class="en">UNITY6 BULLET-HELL BOSS PROTOTYPE</span>
+          <span class="zh">Unity6动作弹幕射击Boss战玩法原型</span>
+        </h3>
+        <div class="project-tags">
+          <span class="project-tag toggle-lang"><span class="en">SOLO</span><span class="zh">单人</span></span>
+          <span class="project-tag toggle-lang"><span class="en">AI-ASSISTED DEV</span><span class="zh">AI辅助开发</span></span>
+          <span class="project-tag toggle-lang"><span class="en">GAMEPLAY & CODE</span><span class="zh">玩法与程序</span></span>
+          <span class="project-tag">2026.04 - 2026.05</span>
+        </div>
+        <div class="project-terminal toggle-lang">
+          <span class="en">
+            <span class="keyword">> CONTEXT:</span> Referenced Returnal's bullet-hell and resource loop. Used AI to independently build a rapid combat prototype.<br>
+            <span class="keyword">> INNOVATION:</span> Innovated skill resource limits and core switching, transforming passive resource systems into active decision-making.<br>
+            <span class="keyword">> AI & PERF:</span> Implemented dual-phase Boss AI via behavior trees; object pool system balanced bullet density and performance.<br>
+            <span class="keyword">> DELIVERY:</span> Optimized mouse/keyboard feel. Completed start/pause menu, key bindings, and settings panel. Packaged as executable.
+          </span>
+          <span class="zh">
+            <span class="keyword">> 背景:</span> 以《死亡回归》高速弹幕+资源循环为参照，利用AI辅助独立完成战斗原型快速落地。<br>
+            <span class="keyword">> 创新:</span> 创新技能资源限制与切换，将压抑被动的资源系统转化为主动可操控的决策体验。<br>
+            <span class="keyword">> AI与性能:</span> 行为树实现双阶段Boss攻击；对象池弹幕系统保证密度与性能平衡。<br>
+            <span class="keyword">> 交付:</span> 优化键鼠手感，完成菜单/键位/设置等交互框架，并打包为可执行文件。
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <a href="https://github.com/OhmaZIOII" target="_blank" class="action-btn" style="margin-top: 1.5rem;">
+      <span class="toggle-lang"><span class="en">GO TO GITHUB ↗</span><span class="zh">前往 GitHub ↗</span></span>
+    </a>
+
+    <div class="panel-inner-hud">
+      <div class="inner-telemetry-group">
+        <div class="inner-metric"><span class="m-key">BUILD_VER</span><span class="m-val">v2.0.4</span></div>
+        <div class="inner-metric"><span class="m-key">PIPELINE</span><span class="m-val">REUSABLE</span></div>
+        <div class="inner-metric"><span class="m-key">STATUS</span><span class="m-val" id="works-status">STABLE</span></div>
+      </div>
+      <div class="inner-note">PIPELINE: NOMINAL</div>
+      <div class="inner-pixel-array" data-pixels>
+        <div class="inner-pixel-cell"></div><div class="inner-pixel-cell"></div><div class="inner-pixel-cell"></div><div class="inner-pixel-cell"></div>
+        <div class="inner-pixel-cell"></div><div class="inner-pixel-cell"></div><div class="inner-pixel-cell"></div><div class="inner-pixel-cell"></div>
+        <div class="inner-pixel-cell"></div><div class="inner-pixel-cell"></div><div class="inner-pixel-cell"></div><div class="inner-pixel-cell"></div>
+        <div class="inner-pixel-cell"></div><div class="inner-pixel-cell"></div><div class="inner-pixel-cell"></div><div class="inner-pixel-cell"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 7. 通讯 (12列) -->
+  <div class="panel contact span-full" data-reveal data-panel-lang="default">
+    <div class="panel-head-row">
+      <span class="label">CODE: e</span>
+      <div class="panel-lang-switch" role="group" aria-label="Panel language">
+        <button class="lang-seg is-active" data-lang="default"><span class="seg-index">00</span><span class="seg-label">EC</span></button>
+        <button class="lang-seg" data-lang="en"><span class="seg-index">01</span><span class="seg-label">EN</span></button>
+        <button class="lang-seg" data-lang="zh"><span class="seg-index">02</span><span class="seg-label">中</span></button>
+      </div>
+    </div>
+    <h2 class="toggle-lang"><span class="en">ESTABLISH COMMS</span><span class="zh">建立通讯</span></h2>
+    
+    <div class="contact-grid">
+      <a href="https://github.com/OhmaZIOII" target="_blank" class="contact-card">
+        <div class="card-id">NODE_01</div>
+        <div class="card-name">GITHUB</div>
+        <div class="card-value">OhmaZIOII</div>
+      </a>
+      
+      <a href="mailto:q2655778603@gmail.com" class="contact-card">
+        <div class="card-id">NODE_02</div>
+        <div class="card-name">EMAIL</div>
+        <div class="card-value">q2655778603@gmail.com</div>
+      </a>
+
+      <a href="https://wpa.qq.com/msgrd?v=3&uin=2655778603&site=qq&menu=yes" target="_blank" class="contact-card">
+        <div class="card-id">NODE_03</div>
+        <div class="card-name">QQ</div>
+        <div class="card-value">2655778603</div>
+      </a>
+
+      <a href="javascript:void(0)" class="contact-card" onclick="navigator.clipboard.writeText('YoRHa0101'); alert('WECHAT ID COPIED // 微信号已复制');">
+        <div class="card-id">NODE_04</div>
+        <div class="card-name">WECHAT</div>
+        <div class="card-value">YoRHa0101</div>
+      </a>
+    </div>
+
+    <div style="margin-top: 2rem; text-align: right; font-family: var(--font-terminal); font-size: 1.3rem; color: var(--text-dim);">
+      ALL SYSTEMS NOMINAL<br>
+      VER: 2.0.4
+    </div>
+
+    <div class="panel-inner-hud" style="border-top-color: rgba(157,0,255,0.2);">
+      <div class="inner-telemetry-group">
+        <div class="inner-metric"><span class="m-key">LINK_STAT</span><span class="m-val m-warning" id="comms-link">ESTABLISHED</span></div>
+        <div class="inner-metric"><span class="m-key">LATENCY</span><span class="m-val" id="comms-lat">12 MS</span></div>
+        <div class="inner-metric"><span class="m-key">ENCRYPTION</span><span class="m-val">AES-256</span></div>
+      </div>
+      <div class="inner-note toggle-lang">
+        <span class="en">RESTRICTED COMMS</span>
+        <span class="zh">受限通讯</span>
+      </div>
+      <div class="inner-pixel-array" data-pixels>
+        <div class="inner-pixel-cell"></div><div class="inner-pixel-cell"></div><div class="inner-pixel-cell"></div><div class="inner-pixel-cell"></div>
+        <div class="inner-pixel-cell"></div><div class="inner-pixel-cell"></div><div class="inner-pixel-cell"></div><div class="inner-pixel-cell"></div>
+        <div class="inner-pixel-cell"></div><div class="inner-pixel-cell"></div><div class="inner-pixel-cell"></div><div class="inner-pixel-cell"></div>
+        <div class="inner-pixel-cell"></div><div class="inner-pixel-cell"></div><div class="inner-pixel-cell"></div><div class="inner-pixel-cell"></div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  © 2026 HONGLIN JIA // ALL RIGHTS RESERVED
+</footer>
+
+<!-- 游戏全档案弹窗 -->
+<div id="game-modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>[ SYSTEM ARCHIVE: GAME LOG ]</h3>
+      <button class="close-btn toggle-lang" id="close-modal">
+        <span class="en">[ CLOSE ]</span>
+        <span class="zh">[ 关闭 ]</span>
+      </button>
+    </div>
+    
+    <div class="modal-section">
+      <h4>// STEAM (Lv.48)</h4>
+      <ul>
+        <li>Destiny 2 <span class="val">1220.53h</span></li>
+        <li>Warframe <span class="val">755.07h</span></li>
+        <li>Counter-Strike 2 <span class="val">624.07h</span></li>
+        <li>PUBG <span class="val">471.7h</span></li>
+        <li>Rainbow Six Siege <span class="val">195.68h</span></li>
+        <li>GTA V <span class="val">173.2h</span></li>
+        <li>Monster Hunter: World <span class="val">128.8h</span></li>
+        <li>ヘブンバーンズレッド <span class="val">93.62h</span></li>
+        <li>Yu-Gi-Oh! Duel Links <span class="val">79.92h</span></li>
+        <li>Monster Hunter Wilds <span class="val">74.13h</span></li>
+        <li>Marathon <span class="val">71.03h</span></li>
+        <li>Sea of Thieves <span class="val">69.18h</span></li>
+        <li>ELDEN RING <span class="val">68.32h</span></li>
+        <li>Diablo IV <span class="val">60.68h</span></li>
+        <li>Yu-Gi-Oh! Master Duel <span class="val">54.7h</span></li>
+        <li>Red Dead Redemption 2 <span class="val">53.3h</span></li>
+        <li>Call of Duty: Black Ops III <span class="val">51.52h</span></li>
+        <li>Terraria <span class="val">50.5h</span></li>
+        <li>DARK SOULS III <span class="val">47.77h</span></li>
+        <li>Yakuza: Like a Dragon <span class="val">46.35h</span></li>
+        <li>Borderlands 4 <span class="val">44.83h</span></li>
+        <li>Dead by Daylight <span class="val">42.47h</span></li>
+        <li>DARK SOULS II <span class="val">42.35h</span></li>
+        <li>DARK SOULS: REMASTERED <span class="val">42.2h</span></li>
+        <li>Shin Megami Tensei V <span class="val">39.8h</span></li>
+        <li>Cyberpunk 2077 <span class="val">39.02h</span></li>
+        <li>OCTOPATH TRAVELER II <span class="val">38.03h</span></li>
+        <li>Delta Force <span class="val">35.87h</span></li>
+        <li>Metaphor: ReFantazio <span class="val">34.28h</span></li>
+        <li>TEKKEN 7 <span class="val">29.8h</span></li>
+        <li>Yakuza 0 <span class="val">29.63h</span></li>
+        <li>The Witcher 3 <span class="val">28.3h</span></li>
+        <li>The Outlast Trials <span class="val">28.15h</span></li>
+        <li>Blue Archive <span class="val">27.67h</span></li>
+        <li>Dying Light <span class="val">27.52h</span></li>
+        <li>P5X <span class="val">26.67h</span></li>
+        <li>Dark and Darker <span class="val">23.55h</span></li>
+        <li>DRAGON QUEST XI S <span class="val">23.38h</span></li>
+        <li>Subnautica <span class="val">22.35h</span></li>
+      </ul>
+    </div>
+
+    <div class="modal-section">
+      <h4>// WEGAME</h4>
+      <ul>
+        <li>英雄联盟 <span class="val">1016h</span></li>
+        <li>枪神纪 <span class="val">637.2h</span></li>
+        <li>地下城与勇士 <span class="val">512h</span></li>
+        <li>穿越火线 <span class="val">281.7h</span></li>
+        <li>三角洲行动 <span class="val">215.7h</span></li>
+        <li>逆战未来 <span class="val">116.7h</span></li>
+        <li>卡厄斯梦境 <span class="val">52.5h</span></li>
+        <li>无畏契约 <span class="val">45.3h</span></li>
+        <li>使命召唤online <span class="val">45.1h</span></li>
+        <li>逆战 <span class="val">44.5h</span></li>
+        <li>Fortnite <span class="val">42.9h</span></li>
+        <li>洛克王国：世界 <span class="val">35.2h</span></li>
+        <li>穿越火线高清大区 <span class="val">24.3h</span></li>
+        <li>命运方舟 <span class="val">23.7h</span></li>
+      </ul>
+    </div>
+
+    <div class="modal-section">
+      <h4>// PLAYSTATION (Lv.176)</h4>
+      <ul>
+        <li>命运2 <span class="val">226h</span></li>
+        <li>灵魂摆渡人 <span class="val">46h</span></li>
+        <li>侠盗猎车手5 <span class="val">32h</span></li>
+        <li>最终幻想7重制版 <span class="val">28h</span></li>
+        <li>对马岛之魂 <span class="val">28h</span></li>
+        <li>漫威蜘蛛侠年度版 <span class="val">28h</span></li>
+        <li>战神4 <span class="val">27h</span></li>
+        <li>双人成行 <span class="val">25h</span></li>
+        <li>孤岛惊魂6 <span class="val">24h</span></li>
+        <li>漫威金刚狼 <span class="val">21h</span></li>
+        <li>最终幻想16 <span class="val">18h</span></li>
+        <li>僵尸世界大战 <span class="val">15h</span></li>
+        <li>无人深空 <span class="val">15h</span></li>
+        <li>神秘海域 <span class="val">14h</span></li>
+        <li>蜘蛛侠迈尔斯 <span class="val">13h</span></li>
+        <li>地平线 零之曙光 <span class="val">12h</span></li>
+        <li>恶魔之魂 <span class="val">12h</span></li>
+        <li>地平线 西之绝境 <span class="val">10h</span></li>
+        <li>使命召唤 冷战 <span class="val">9.8h</span></li>
+        <li>战神3 重制版 <span class="val">9.7h</span></li>
+      </ul>
+    </div>
+
+    <div class="modal-section">
+      <h4>// MIHOYO & NETEASE & OTHERS</h4>
+      <ul>
+        <li>原神 <span class="val">1459天 / 1105成就</span></li>
+        <li>崩坏星穹铁道 <span class="val">1055天 / 1047成就</span></li>
+        <li>崩坏3 <span class="val">1300天 / 91装甲</span></li>
+        <li>绝区零 <span class="val">501天 / 278成就</span></li>
+        <li>崩坏学园2 <span class="val">58h</span></li>
+        <li>阴阳师 <span class="val">2612天 / 5500成就</span></li>
+        <li>燕云十六声 <span class="val">Lv.100 / 246成就</span></li>
+        <li>漫威终极逆转 <span class="val">Lv.79</span></li>
+        <li>鸣潮 <span class="val">Lv.69 / 270成就</span></li>
+        <li>明日方舟 <span class="val">Lv.43 / 129干员</span></li>
+        <li>明日方舟终末地 <span class="val">Lv.54 / 46蚀刻章</span></li>
+        <li>FGO <span class="val">1320天 / 533从者</span></li>
+        <li>众神派对 <span class="val">279天 Lv.91</span></li>
+        <li>剑与远征启程 <span class="val">57天 3285万战力</span></li>
+        <li>王者荣耀 <span class="val">3951天 / 至圣王者47星</span></li>
+        <li>火影忍者 <span class="val">3900天 / 171忍者</span></li>
+        <li>魂斗罗：归来 <span class="val">Lv.242 / 3.3亿战力</span></li>
+        <li>塞尔达传说 (Switch) <span class="val">426h</span></li>
+      </ul>
+    </div>
+    
+    <div style="margin-top: 2rem; padding-top: 1rem; border-top: 1px dashed var(--border); text-align: center; font-family: var(--font-terminal); font-size: 1.4rem; color: var(--f-games); letter-spacing: 0.1em;">
+        > AND MORE... // 还有更多...
+    </div>
+  </div>
+</div>
+
+<script>
+/* ===== 1. 时钟 ===== */
+function updateClock() {
+  const now = new Date();
+  const h = String(now.getHours()).padStart(2, '0');
+  const m = String(now.getMinutes()).padStart(2, '0');
+  const s = String(now.getSeconds()).padStart(2, '0');
+  document.getElementById('clock').textContent = `${h}:${m}:${s}`;
+}
+updateClock(); setInterval(updateClock, 1000);
+
+/* ===== 2. 滚动入场动画（纯淡入） ===== */
+const panelObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('revealed');
+      panelObserver.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+
+document.querySelectorAll('[data-reveal]').forEach(el => panelObserver.observe(el));
+
+/* ===== 3. 面板级语言开关 ===== */
+document.querySelectorAll('.panel-lang-switch').forEach(switchEl => {
+  const panel = switchEl.closest('.panel');
+  if (!panel) return;
+  if (!panel.dataset.panelLang) panel.dataset.panelLang = 'default';
+
+  switchEl.querySelectorAll('.lang-seg').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const mode = btn.dataset.lang;
+      panel.dataset.panelLang = mode;
+      panel.classList.remove('active');
+
+      switchEl.querySelectorAll('.lang-seg').forEach(b => {
+        b.classList.toggle('is-active', b === btn);
+      });
+    });
+  });
+});
+
+/* ===== 4. 触屏端：default 模式下点击面板预览中文 ===== */
+const isTouchDevice = window.matchMedia('(hover: none)').matches;
+if (isTouchDevice) {
+  document.querySelectorAll('.panel').forEach(panel => {
+    panel.addEventListener('click', (e) => {
+      if (e.target.closest('a') || e.target.closest('input') || e.target.closest('button') || e.target.closest('.panel-lang-switch')) return;
+      if (panel.dataset.panelLang !== 'default') return;
+      panel.classList.toggle('active');
+    });
+  });
+}
+
+/* ===== 5. 死链拦截反馈 ===== */
+const statusBar = document.getElementById('top-status-bar');
+document.querySelectorAll('[data-dead-link]').forEach(link => {
+  link.addEventListener('click', (e) => {
+    e.preventDefault();
+    statusBar.classList.add('alert');
+    const originalHtml = statusBar.querySelector('.left').innerHTML;
+    statusBar.querySelector('.left').innerHTML = `<span>ERR: LINK PENDING // 模块未接入</span>`;
+    
+    setTimeout(() => {
+      statusBar.classList.remove('alert');
+      statusBar.querySelector('.left').innerHTML = originalHtml;
+    }, 2000);
+  });
+});
+
+/* ===== 6. 动态系统日志（双语） ===== */
+const logBox = document.getElementById('sys-log');
+
+// 双语映射数组
+const logs = [
+  { en: "> MOUNTING CORE...", zh: "> 正在挂载核心..." },
+  { en: "> 2024: BACHELOR OF APPLIED INFORMATICS_V0.1.", zh: "> 2024年：应用信息学学士_版本V0.1。" },
+  { en: "> 2024: UPGRADED TO INFORMATION SYSTEMS MGMT.", zh: "> 2024年：升级至信息系统管理。" },
+  { en: "> LOADING MODULE...", zh: "> 正在加载模块..." },
+  { en: "> TARGET: EXTRACT VIDEO STREAM DATA TO BUILD 3D SKELETON & VISUALIZE GAIT.", zh: "> 目标：提取视频流数据构建人体3D骨骼并进行步态分析与可视化。" },
+  { en: "> METHOD: VIDEOPOSE3D.", zh: "> 方法：VIDEOPOSE3D。" },
+  { en: "> ACQUIRED: DATA MODELING & DB SYSTEMS (5).", zh: "> 已获取：数据模型与数据库系统 (5)。" },
+  { en: "> ACQUIRED: R LANG DATA VIS (10).", zh: "> 已获取：R语言数据可视化 (10)。" },
+  { en: "> ACQUIRED: MULTIVARIATE STAT ANALYSIS (7).", zh: "> 已获取：多元统计分析 (7)。" },
+  { en: "> DEPLOYING SUPER-AGENT AI WORKFLOWS...", zh: "> 正在部署超级智能体 AI 工作流..." },
+  { en: "> 2026: MASTER OF INFORMATION SYSTEMS_V1.0.", zh: "> 2026年：信息系统管理硕士_版本V1.0。" },
+  { en: "> CONNECTING TO WORK...", zh: "> 接入工作中..." },
+  { en: "> SYSTEM STATUS: READY FOR NEW MISSIONS.", zh: "> 系统状态：已准备好迎接新任务。" }
+];
+
+let logIndex = 0;
+
+function appendLog() {
+  if (logIndex >= logs.length) return;
+  
+  // 高亮年份格式
+  const enText = logs[logIndex].en.replace(/(\d{4}:)/, '<span class="highlight">$1</span>');
+  const zhText = logs[logIndex].zh.replace(/(\d{4}年：)/, '<span class="highlight">$1</span>');
+  
+  const div = document.createElement('div');
+  div.className = 'sys-log-line';
+  
+  // 利用 toggle-lang 机制，接入中英文切换
+  div.innerHTML = `
+    <span class="toggle-lang" style="display: inline-grid; justify-content: start;">
+      <span class="en" style="font-family: var(--font-terminal);">${enText}</span>
+      <span class="zh" style="font-family: var(--font-terminal);">${zhText}</span>
+    </span>
+  `;
+  
+  logBox.appendChild(div);
+  logBox.scrollTop = logBox.scrollHeight; 
+  logIndex++;
+  setTimeout(appendLog, 1500);
+}
+setTimeout(appendLog, 1000); 
+
+/* ===== 7. 面板内嵌遥测数据动态刷新 ===== */
+function randomNum(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+setInterval(() => {
+  const sync = document.getElementById('exp-sync');
+  if(sync) sync.textContent = (98 + Math.random() * 1.99).toFixed(2) + '%';
+}, 2000);
+
+setInterval(() => {
+  const cpu = document.getElementById('skills-cpu');
+  const thru = document.getElementById('skills-thru');
+  if(cpu) cpu.textContent = (30 + Math.random() * 40).toFixed(1) + '%';
+  if(thru) thru.textContent = (1.0 + Math.random() * 2.5).toFixed(2) + ' GB/S';
+}, 1800);
+
+setInterval(() => {
+  const fps = document.getElementById('games-fps');
+  if(fps) fps.textContent = randomNum(590, 595);
+}, 2500);
+
+const buildStatuses = ['STABLE', 'BUILDING', 'DEPLOYED', 'PENDING'];
+setInterval(() => {
+  const stat = document.getElementById('works-status');
+  if(stat) {
+    const s = buildStatuses[randomNum(0, 3)];
+    stat.textContent = s;
+    if(s === 'STABLE' || s === 'DEPLOYED') {
+      stat.className = 'm-val';
+    } else {
+      stat.className = 'm-val m-warning';
+    }
+  }
+}, 2200);
+
+setInterval(() => {
+  const lat = document.getElementById('comms-lat');
+  if(lat) lat.textContent = randomNum(8, 45) + ' MS';
+}, 2000);
+
+/* ===== 8. 面板内嵌像素光栅动态闪烁 ===== */
+document.querySelectorAll('[data-pixels]').forEach(pixelGroup => {
+  const cells = pixelGroup.querySelectorAll('.inner-pixel-cell');
+  setInterval(() => {
+    cells.forEach(cell => {
+      const isOn = Math.random() > 0.35;
+      const panelColor = getComputedStyle(pixelGroup.closest('.panel')).getPropertyValue('--panel-color').trim();
+      cell.style.background = isOn ? panelColor : 'rgba(255,255,255,0.05)';
+      cell.style.boxShadow = isOn ? `0 0 6px ${panelColor}` : 'none';
+    });
+  }, 400 + Math.random() * 300);
+});
+
+/* ===== 9. 游戏档案弹窗控制 ===== */
+const openBtn = document.getElementById('open-archive-btn');
+const closeBtn = document.getElementById('close-modal');
+const modal = document.getElementById('game-modal');
+const gamesPanel = document.querySelector('.panel.games');
+
+openBtn.addEventListener('click', (e) => {
+  e.preventDefault();
+  if (gamesPanel) modal.dataset.panelLang = gamesPanel.dataset.panelLang || 'default';
+  modal.classList.add('active');
+});
+
+closeBtn.addEventListener('click', () => {
+  modal.classList.remove('active');
+});
+
+modal.addEventListener('click', (e) => {
+  if (e.target === modal) modal.classList.remove('active');
+});
+
+/* ===== 10. 个人信息：4x4 数据流矩阵（呼吸式变换） ===== */
+const avatarGrid = document.getElementById('avatar-grid');
+const cells = [];
+
+for (let i = 0; i < 16; i++) {
+  const cell = document.createElement('div');
+  cell.className = 'avatar-cell';
+  avatarGrid.appendChild(cell);
+  cells.push(cell);
+}
+
+cells.forEach(cell => {
+  if (Math.random() > 0.5) cell.classList.add('active');
+});
+
+setInterval(() => {
+  const flipCount = 2 + Math.floor(Math.random() * 3);
+  for (let k = 0; k < flipCount; k++) {
+    const idx = Math.floor(Math.random() * 16);
+    cells[idx].classList.toggle('active');
+  }
+}, 800);
+
+/* ===== 11. 加密扇区：动态哈希刷新 ===== */
+(function() {
+  const hashEl = document.getElementById('enc-hash');
+  if (!hashEl) return;
+  const chars = '0123456789ABCDEF';
+  function genHash() {
+    let h = '0x';
+    for (let i = 0; i < 4; i++) h += chars[Math.floor(Math.random() * 16)];
+    h += '...';
+    for (let i = 0; i < 4; i++) h += chars[Math.floor(Math.random() * 16)];
+    return h;
+  }
+  setInterval(() => {
+    hashEl.textContent = genHash();
+  }, 3000);
+})();
+</script>
+
+</body>
+</html>
