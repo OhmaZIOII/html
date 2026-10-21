@@ -6,7 +6,6 @@
 <title>OPERATOR TERMINAL // HONGLIN JIA</title>
 <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700&family=IBM+Plex+Mono:wght@400;600&family=VT323&display=swap" rel="stylesheet">
 <style>
-/* ===== 核心变量（加入流式排版与更严谨的间距） ===== */
 :root {
   --bg: #050505;
   --panel: rgba(13, 13, 13, 0.95);
@@ -31,7 +30,6 @@
   --font-terminal: 'VT323', monospace;     
   --font-cn: 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
 
-  /* 流式尺寸变量，确保全分辨率下比例和谐 */
   --fluid-h1: clamp(3rem, 7vw, 7rem);
   --fluid-h2: clamp(2rem, 4vw, 3.5rem);
   --fluid-p: clamp(0.9rem, 1.1vw, 1.1rem);
@@ -42,7 +40,19 @@
 html { font-size: 16px; }
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
-/* ===== 键盘导航无障碍 ===== */
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-mono); 
+  min-height: 100vh;
+  overflow-x: clip; 
+  position: relative;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
 :focus-visible {
   outline: 2px dashed var(--f-works) !important;
   outline-offset: 4px;
@@ -54,16 +64,6 @@ html { font-size: 16px; }
 }
 :focus:not(:focus-visible) { outline: none; }
 
-body {
-  background: var(--bg);
-  color: var(--text);
-  font-family: var(--font-mono); 
-  min-height: 100vh;
-  overflow-x: clip; 
-  position: relative;
-}
-
-/* ===== CRT 扫描线与噪点 ===== */
 body::before {
   content: ""; position: fixed; inset: 0;
   background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.08) 2px, rgba(0,0,0,0.08) 4px);
@@ -75,7 +75,6 @@ body::after {
   pointer-events: none; z-index: 1000;
 }
 
-/* ===== 顶部状态栏 ===== */
 .status-bar {
   display: flex; justify-content: space-between; align-items: center;
   padding: 12px clamp(1rem, 4vw, 3rem); 
@@ -93,7 +92,6 @@ body::after {
 .status-bar .blink { color: var(--f-contact); animation: blink 1s step-end infinite; }
 @keyframes blink { 50% { opacity: 0; } }
 
-/* ===== 核心：全分辨率自适应 12 列非对称网格 ===== */
 .grid {
   display: grid; 
   grid-template-columns: 1fr; 
@@ -141,7 +139,6 @@ body::after {
   .grid { max-width: 2000px; }
 }
 
-/* ===== 面板基础 ===== */
 .panel {
   background: var(--panel); 
   padding: var(--fluid-pad); 
@@ -179,7 +176,6 @@ body::after {
 .panel.works { --hover-color: var(--f-works); }
 .panel.contact { --hover-color: var(--f-contact-panel); }
 
-/* ===== 面板头部行 ===== */
 .panel-head-row {
   display: flex;
   justify-content: space-between;
@@ -190,7 +186,6 @@ body::after {
 }
 .panel-head-row .label { margin-bottom: 0; }
 
-/* ===== 语言开关 [00 EC / 01 EN / 02 中] ===== */
 .panel-lang-switch {
   display: inline-grid;
   grid-template-columns: 2fr 1fr 1fr;
@@ -224,7 +219,6 @@ body::after {
 .lang-seg:hover:not(.is-active) { color: var(--text-dim); border-bottom-color: var(--border); }
 .lang-seg:focus-visible { outline: 1px solid var(--swiss-accent); outline-offset: -1px; }
 
-/* ===== 4x4 数据流矩阵头像 ===== */
 .avatar-container {
   width: clamp(80px, 10vw, 120px); 
   height: clamp(80px, 10vw, 120px); 
@@ -257,7 +251,6 @@ body::after {
   100% { box-shadow: 0 0 16px var(--f-works), inset 0 0 4px var(--f-works); }
 }
 
-/* ===== 名言 ===== */
 .quote-text {
   font-family: var(--font-terminal);
   font-size: clamp(1.2rem, 1.5vw, 1.6rem);
@@ -267,7 +260,6 @@ body::after {
   display: inline-block;
 }
 
-/* ===== 三态语言切换 ===== */
 .toggle-lang { display: inline-grid; align-items: center; vertical-align: middle; }
 .toggle-lang .en, .toggle-lang .zh {
   grid-area: 1 / 1; 
@@ -279,23 +271,19 @@ body::after {
   font-family: var(--font-cn);
 }
 
-/* 默认模式：桌面端悬停预览中文 */
 @media (hover: hover) {
   .panel[data-panel-lang="default"]:hover .toggle-lang .en { opacity: 0; pointer-events: none; }
   .panel[data-panel-lang="default"]:hover .toggle-lang .zh { opacity: 1; pointer-events: auto; }
 }
-/* 触屏：default 模式下点击面板切换预览 */
 .panel[data-panel-lang="default"].active .toggle-lang .en { opacity: 0; pointer-events: none; }
 .panel[data-panel-lang="default"].active .toggle-lang .zh { opacity: 1; pointer-events: auto; }
 
-/* 显式 EN */
 [data-panel-lang="en"] .toggle-lang .en { opacity: 1 !important; pointer-events: auto !important; }
 [data-panel-lang="en"] .toggle-lang .zh { opacity: 0 !important; pointer-events: none !important; }
-/* 显式 ZH */
+
 [data-panel-lang="zh"] .toggle-lang .en { opacity: 0 !important; pointer-events: none !important; }
 [data-panel-lang="zh"] .toggle-lang .zh { opacity: 1 !important; pointer-events: auto !important; }
 
-/* ===== 排版 ===== */
 .label {
   font-family: var(--font-terminal); 
   font-size: clamp(1.1rem, 1.2vw, 1.4rem); 
@@ -328,7 +316,6 @@ p {
   margin-bottom: 1.5rem; 
 }
 
-/* ===== 数据网格 ===== */
 .data-grid {
   display: grid; 
   grid-template-columns: 1fr 1fr; 
@@ -352,7 +339,6 @@ p {
   transition: color 0.2s steps(2, end);
 }
 
-/* ===== 技能列表 ===== */
 .skill-list {
   display: flex;
   flex-direction: column;
@@ -385,7 +371,6 @@ p {
   max-width: 100%;
 }
 
-/* ===== 标签 ===== */
 .competency-list {
   display: flex; flex-wrap: wrap; gap: 6px; margin-top: 1rem; list-style: none;
 }
@@ -397,7 +382,6 @@ p {
 }
 .panel:hover .competency-list li { border-color: var(--panel-color); color: var(--panel-color); }
 
-/* ===== 动态系统日志（支持中英文与滚动条） ===== */
 .sys-log-box {
   background: #000; 
   border-left: 1px solid var(--border);
@@ -410,21 +394,12 @@ p {
   overflow-y: auto; 
   position: relative;
 }
-/* 滚动条样式定制 */
-.sys-log-box::-webkit-scrollbar {
-  width: 4px;
-}
-.sys-log-box::-webkit-scrollbar-track {
-  background: #111;
-}
-.sys-log-box::-webkit-scrollbar-thumb {
-  background: var(--panel-color);
-  border-radius: 2px;
-}
+.sys-log-box::-webkit-scrollbar { width: 4px; }
+.sys-log-box::-webkit-scrollbar-track { background: #111; }
+.sys-log-box::-webkit-scrollbar-thumb { background: var(--panel-color); border-radius: 2px; }
 .sys-log-line { margin-bottom: 4px; line-height: 1.4; display: block; }
 .sys-log-line span.highlight { color: var(--panel-color); }
 
-/* ===== 按钮 ===== */
 .action-btn {
   display: inline-block; padding: 8px 20px; margin-top: 1.5rem;
   background: transparent; border: 1px solid var(--panel-color);
@@ -438,7 +413,6 @@ p {
 .action-btn:hover { background: var(--panel-color); color: #000; box-shadow: 0 0 15px var(--panel-color); }
 .action-btn .toggle-lang { width: 100%; text-align: center; }
 
-/* ===== 联系方式卡片 ===== */
 .contact-grid {
   display: grid; 
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -460,14 +434,12 @@ p {
 .contact-card:hover .card-name, .contact-card:hover .card-value, .contact-card:hover .card-id,
 .contact-card:focus-visible .card-name, .contact-card:focus-visible .card-value, .contact-card:focus-visible .card-id { color: #000; }
 
-/* ===== 页脚 ===== */
 footer {
   text-align: center; padding: 3rem 1.5rem; font-family: var(--font-terminal);
   font-size: 1.2rem; color: var(--text-dim-dark); text-transform: uppercase;
   letter-spacing: 0.15em; background: #000; position: relative; z-index: 10;
 }
 
-/* ===== 内嵌面板 HUD ===== */
 .panel-inner-hud {
   display: flex; flex-wrap: wrap; justify-content: space-between; gap: 1rem;
   margin-top: 2rem; padding-top: 1.5rem; border-top: 1px dashed rgba(255, 255, 255, 0.08);
@@ -482,7 +454,6 @@ footer {
 .inner-pixel-array { display: grid; grid-template-columns: repeat(4, 10px); gap: 2px; align-self: flex-end; margin-left: auto; }
 .inner-pixel-cell { width: 10px; height: 10px; background: rgba(255, 255, 255, 0.05); transition: background 0.15s steps(2, end); }
 
-/* ===== 项目终端卡片 ===== */
 .project-card {
   background: rgba(0,0,0,0.6); border: 1px solid var(--border);
   border-top: 2px solid var(--panel-color); padding: 1.5rem; 
@@ -513,7 +484,6 @@ footer {
   color: var(--panel-color); font-weight: bold;
 }
 
-/* ===== 弹窗 ===== */
 #game-modal {
   position: fixed; inset: 0; background: rgba(5, 5, 5, 0.95);
   z-index: 10000; display: none; justify-content: center; align-items: center;
@@ -547,7 +517,6 @@ footer {
 .modal-content li { display: flex; justify-content: space-between; border-bottom: 1px solid #1a1a1a; padding-bottom: 2px; }
 .modal-content li span.val { color: var(--f-games); font-family: var(--font-terminal); font-size: 1rem; }
 
-/* ===== 首屏专属 ===== */
 .profile-header {
   display: flex; align-items: center; gap: 1.5rem; margin-bottom: 2rem;
 }
@@ -561,7 +530,6 @@ footer {
   text-align: right; margin: 0; max-width: 100% !important;
 }
 
-/* ===== 加密扇区面板 ===== */
 .panel.encrypted {
   --panel-color: var(--marathon-red);
   --hover-color: var(--marathon-red);
@@ -651,7 +619,6 @@ footer {
   .panel.span-wide .enc-meta { padding-left: 1.5rem; flex-direction: column; }
 }
 
-/* ===== 响应式补充 ===== */
 @media (max-width: 900px) {
   .profile-content { grid-template-columns: 1fr; gap: 1.5rem; }
   .profile-content .quote-block { border-left: none; border-top: 1px dashed var(--border); padding-top: 1rem; padding-left: 0; }
@@ -676,7 +643,6 @@ footer {
 </head>
 <body>
 
-<!-- 顶部状态栏 -->
 <div class="status-bar" id="top-status-bar">
   <div class="left">
     <span>SYS.STATUS: <span class="blink">●</span> ONLINE</span>
@@ -688,7 +654,6 @@ footer {
 </div>
 
 <main class="grid">
-  <!-- 1. 欢迎面板 (12列) -->
   <div class="panel span-full" data-reveal data-panel-lang="default">
     <div class="panel-topbar" style="border-bottom: 1px solid var(--border); padding-bottom: 0.75rem; margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center;">
       <span style="font-family: var(--font-terminal); font-size: 1.4rem; color: var(--panel-color); text-transform: uppercase; letter-spacing: 0.1em; display: flex; align-items: center;">
@@ -749,7 +714,6 @@ footer {
     </div>
   </div>
 
-  <!-- 2. 学术经历 (7列) -->
   <div class="panel journey" data-reveal data-panel-lang="default">
     <div class="panel-head-row">
       <span class="label">CODE: a</span>
@@ -810,7 +774,6 @@ footer {
     </div>
   </div>
 
-  <!-- 3. 个人技能 (5列) -->
   <div class="panel music" data-reveal data-panel-lang="default">
     <div class="panel-head-row">
       <span class="label">CODE: b</span>
@@ -884,7 +847,6 @@ footer {
     </div>
   </div>
 
-  <!-- 4. 游戏经历 (7列) -->
   <div class="panel games" data-reveal data-panel-lang="default">
     <div class="panel-head-row">
       <span class="label">CODE: c</span>
@@ -960,7 +922,6 @@ footer {
     </div>
   </div>
 
-  <!-- 5. 加密扇区面板 (5列) -->
   <div class="panel encrypted" data-reveal data-panel-lang="en">
     <div class="panel-head-row">
       <span class="label">CODE: x</span>
@@ -1007,7 +968,6 @@ footer {
     </div>
   </div>
 
-  <!-- 6. 项目作品 (12列) -->
   <div class="panel works span-full" data-reveal data-panel-lang="default">
     <div class="panel-head-row">
       <span class="label">CODE: d</span>
@@ -1077,7 +1037,7 @@ footer {
       </div>
     </div>
 
-    <a href="https://github.com/OhmaZIOII" target="_blank" class="action-btn" style="margin-top: 1.5rem;">
+    <a href="https://github.com/YozNT27" target="_blank" class="action-btn" style="margin-top: 1.5rem;">
       <span class="toggle-lang"><span class="en">GO TO GITHUB ↗</span><span class="zh">前往 GitHub ↗</span></span>
     </a>
 
@@ -1097,7 +1057,6 @@ footer {
     </div>
   </div>
 
-  <!-- 7. 通讯 (12列) -->
   <div class="panel contact span-full" data-reveal data-panel-lang="default">
     <div class="panel-head-row">
       <span class="label">CODE: e</span>
@@ -1110,10 +1069,10 @@ footer {
     <h2 class="toggle-lang"><span class="en">ESTABLISH COMMS</span><span class="zh">建立通讯</span></h2>
     
     <div class="contact-grid">
-      <a href="https://github.com/OhmaZIOII" target="_blank" class="contact-card">
+      <a href="https://github.com/YozNT27" target="_blank" class="contact-card">
         <div class="card-id">NODE_01</div>
         <div class="card-name">GITHUB</div>
-        <div class="card-value">OhmaZIOII</div>
+        <div class="card-value">YozNT27</div>
       </a>
       
       <a href="mailto:q2655778603@gmail.com" class="contact-card">
@@ -1164,7 +1123,6 @@ footer {
   © 2026 HONGLIN JIA // ALL RIGHTS RESERVED
 </footer>
 
-<!-- 游戏全档案弹窗 -->
 <div id="game-modal">
   <div class="modal-content">
     <div class="modal-header">
@@ -1297,7 +1255,16 @@ footer {
 </div>
 
 <script>
-/* ===== 1. 时钟 ===== */
+document.addEventListener('contextmenu', event => event.preventDefault());
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'F12' || 
+     (e.ctrlKey && e.shiftKey && e.key === 'I') || 
+     (e.ctrlKey && e.shiftKey && e.key === 'J') || 
+     (e.ctrlKey && e.key === 'U')) {
+    e.preventDefault();
+  }
+});
+
 function updateClock() {
   const now = new Date();
   const h = String(now.getHours()).padStart(2, '0');
@@ -1307,7 +1274,6 @@ function updateClock() {
 }
 updateClock(); setInterval(updateClock, 1000);
 
-/* ===== 2. 滚动入场动画（纯淡入） ===== */
 const panelObserver = new IntersectionObserver((entries) => {
   entries.forEach(entry => {
     if (entry.isIntersecting) {
@@ -1319,7 +1285,6 @@ const panelObserver = new IntersectionObserver((entries) => {
 
 document.querySelectorAll('[data-reveal]').forEach(el => panelObserver.observe(el));
 
-/* ===== 3. 面板级语言开关 ===== */
 document.querySelectorAll('.panel-lang-switch').forEach(switchEl => {
   const panel = switchEl.closest('.panel');
   if (!panel) return;
@@ -1339,7 +1304,6 @@ document.querySelectorAll('.panel-lang-switch').forEach(switchEl => {
   });
 });
 
-/* ===== 4. 触屏端：default 模式下点击面板预览中文 ===== */
 const isTouchDevice = window.matchMedia('(hover: none)').matches;
 if (isTouchDevice) {
   document.querySelectorAll('.panel').forEach(panel => {
@@ -1351,7 +1315,6 @@ if (isTouchDevice) {
   });
 }
 
-/* ===== 5. 死链拦截反馈 ===== */
 const statusBar = document.getElementById('top-status-bar');
 document.querySelectorAll('[data-dead-link]').forEach(link => {
   link.addEventListener('click', (e) => {
@@ -1367,10 +1330,8 @@ document.querySelectorAll('[data-dead-link]').forEach(link => {
   });
 });
 
-/* ===== 6. 动态系统日志（双语） ===== */
 const logBox = document.getElementById('sys-log');
 
-// 双语映射数组
 const logs = [
   { en: "> MOUNTING CORE...", zh: "> 正在挂载核心..." },
   { en: "> 2024: BACHELOR OF APPLIED INFORMATICS_V0.1.", zh: "> 2024年：应用信息学学士_版本V0.1。" },
@@ -1392,14 +1353,12 @@ let logIndex = 0;
 function appendLog() {
   if (logIndex >= logs.length) return;
   
-  // 高亮年份格式
   const enText = logs[logIndex].en.replace(/(\d{4}:)/, '<span class="highlight">$1</span>');
   const zhText = logs[logIndex].zh.replace(/(\d{4}年：)/, '<span class="highlight">$1</span>');
   
   const div = document.createElement('div');
   div.className = 'sys-log-line';
   
-  // 利用 toggle-lang 机制，接入中英文切换
   div.innerHTML = `
     <span class="toggle-lang" style="display: inline-grid; justify-content: start;">
       <span class="en" style="font-family: var(--font-terminal);">${enText}</span>
@@ -1414,7 +1373,6 @@ function appendLog() {
 }
 setTimeout(appendLog, 1000); 
 
-/* ===== 7. 面板内嵌遥测数据动态刷新 ===== */
 function randomNum(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
@@ -1455,7 +1413,6 @@ setInterval(() => {
   if(lat) lat.textContent = randomNum(8, 45) + ' MS';
 }, 2000);
 
-/* ===== 8. 面板内嵌像素光栅动态闪烁 ===== */
 document.querySelectorAll('[data-pixels]').forEach(pixelGroup => {
   const cells = pixelGroup.querySelectorAll('.inner-pixel-cell');
   setInterval(() => {
@@ -1468,7 +1425,6 @@ document.querySelectorAll('[data-pixels]').forEach(pixelGroup => {
   }, 400 + Math.random() * 300);
 });
 
-/* ===== 9. 游戏档案弹窗控制 ===== */
 const openBtn = document.getElementById('open-archive-btn');
 const closeBtn = document.getElementById('close-modal');
 const modal = document.getElementById('game-modal');
@@ -1488,7 +1444,6 @@ modal.addEventListener('click', (e) => {
   if (e.target === modal) modal.classList.remove('active');
 });
 
-/* ===== 10. 个人信息：4x4 数据流矩阵（呼吸式变换） ===== */
 const avatarGrid = document.getElementById('avatar-grid');
 const cells = [];
 
@@ -1511,7 +1466,6 @@ setInterval(() => {
   }
 }, 800);
 
-/* ===== 11. 加密扇区：动态哈希刷新 ===== */
 (function() {
   const hashEl = document.getElementById('enc-hash');
   if (!hashEl) return;
